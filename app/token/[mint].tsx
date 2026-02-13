@@ -4,7 +4,6 @@ import {
     ActivityIndicator,
     View,
     Text,
-    StyleSheet,
     ScrollView,
     TouchableOpacity,
 } from "react-native";
@@ -96,7 +95,7 @@ export default function TokenDetailScreen() {
                         <View style = {styles.infoRow}>
                             <Text style = {styles.infoLabel}>Total Supply</Text>
                             <Text style = {styles.infoValue}>
-                                {tokenInfo.supply?.toLocalString() || "Unknown" }
+                                {tokenInfo.amount?.toLocalString() || "Unknown" }
                             </Text>
                         </View>
                         <View style = {styles.divider}/>

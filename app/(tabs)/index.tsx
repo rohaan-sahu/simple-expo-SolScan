@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useState } from "react";
 import {
   TextInput,
@@ -57,15 +57,6 @@ const getTxns = async (addr: string) => {
   }));
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-
 const short = (s: string, n = 4) => `${s.slice(0, n)}...${s.slice(-n)}`;
 
 const timeAgo = (ts: number) => {
@@ -76,7 +67,7 @@ const timeAgo = (ts: number) => {
   return `${Math.floor(s / 86400)}d ago`;
 };
 
-export function WalletScreen() {
+export default function WalletScreen() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
@@ -86,23 +77,32 @@ export function WalletScreen() {
   const router = useRouter();
 
   const search = async () => {
-  const addr = address.trim();
-  if (!addr) return Alert.alert("Enter a wallet address");
+    const addr = address.trim();
+    if (!addr) return Alert.alert("Enter a wallet address");
 
-  setLoading(true);
-  try {
-    const [bal, tok, tx] = await Promise.all([
-      getBalance(addr),
-      getTokens(addr),
-      getTxns(addr),
-    ]);
-    setBalance(bal);
-    setTokens(tok);
-    setTxns(tx);
-  } catch (e: any) {
-    Alert.alert("Error", e.message);
-  }
-  setLoading(false);
+    setLoading(true);
+    try {
+      const bal = await getBalance(addr).catch(e => {
+        Alert.alert("Balance Error", e.message);
+        return null;
+      });
+      
+      const tok = await getTokens(addr).catch(e => {
+        Alert.alert("Tokens Error", e.message);
+        return [];
+      });
+      
+      const tx = await getTxns(addr).catch(e => {
+        Alert.alert("Transactions Error", e.message);
+        return [];
+      });
+
+      if (bal !== null) setBalance(bal);
+      setTokens(tok);
+      setTxns(tx);
+    } finally {
+      setLoading(false);
+    }
 };
 
 const tryExample = () => {
@@ -112,6 +112,7 @@ const tryExample = () => {
 
   return (
     <SafeAreaView style = {s.safe}>
+      
       <ScrollView style = {s.scroll}>
         {/* Header */}
         <Text style={s.title}>SolScan</Text>
@@ -226,7 +227,6 @@ const tryExample = () => {
           </>
         )}
 
-        <StatusBar style="auto" />
         <TextInput onChangeText={setAddress} />
         
         <View style={{ height: 80 }} />
