@@ -12,13 +12,13 @@ import {
   Linking,
 } from "react-native";
 
-import s from '../../styles';
+import s from '../styles';
 
 
-const RPC = "https://api.mainnet-beta.solana.com";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
 
 const rpc = async (method: string, params: any[]) => {
-  const res = await fetch(RPC, {
+  const res = await fetch(RPC_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
