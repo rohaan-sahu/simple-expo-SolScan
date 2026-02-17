@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Text, View } from 'react-native';
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import {
   TextInput,
   TouchableOpacity,
@@ -9,17 +9,19 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
+// Local imports
 import { walletStyles as s } from '@/styles/walletStyles';
+import { useWalletStore } from '@/stores/wallet-stores';
 
-
-const RPC_URL = "https://api.mainnet-beta.solana.com";
-
-const rpc = async (method: string, params: any[]) => {
-  const res = await fetch(RPC_URL, {
+const rpc = async (rpcUrl: string,method: string, params: any[]) => {
+  const res = await fetch(rpcUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
@@ -29,13 +31,13 @@ const rpc = async (method: string, params: any[]) => {
   return json.result;
 };
 
-const getBalance = async (addr: string) => {
-  const result = await rpc("getBalance", [addr]);
+const getBalance = async (rpcUrl:string,addr: string) => {
+  const result = await rpc(rpcUrl,"getBalance", [addr]);
   return result.value / 1_000_000_000;
 };
 
-const getTokens = async (addr: string) => {
-  const result = await rpc("getTokenAccountsByOwner", [
+const getTokens = async (rpcUrl:string,addr: string) => {
+  const result = await rpc(rpcUrl,"getTokenAccountsByOwner", [
     addr,
     { programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
     { encoding: "jsonParsed" },
@@ -48,8 +50,8 @@ const getTokens = async (addr: string) => {
     .filter((t: any) => t.amount > 0);
 };
 
-const getTxns = async (addr: string) => {
-  const sigs = await rpc("getSignaturesForAddress", [addr, { limit: 10 }]);
+const getTxns = async (rpcUrl:string,addr: string) => {
+  const sigs = await rpc(rpcUrl,"getSignaturesForAddress", [addr, { limit: 10 }]);
   return sigs.map((s: any) => ({
     sig: s.signature,
     time: s.blockTime,
@@ -75,6 +77,20 @@ export default function WalletScreen() {
   const [txns, setTxns] = useState<any[]>([]);
 
   const router = useRouter();
+  const addToHistory = useWalletStore((s) => s.addToHistory);
+  const searchHistory = useWalletStore((s) => s.searchHistory);
+  const isDevnet = useWalletStore((s) => s.isDevnet);
+  const toggleNetwork = useWalletStore((s)=> s.toggleNetwork);
+  const clearHistory = useWalletStore((s)=> s.clearHistory)
+
+  const DEVNET_URL = "https://api.devnet.solana.com";
+  const MAINNET_URL = "https://api.mainnet-beta.solana.com";
+  const RPC_URL = isDevnet ? DEVNET_URL : MAINNET_URL;
+
+  const handleSearch = async (address: string) => {
+      addToHistory(address); // Save to history automatically
+      // ...rest of your lookup code, now using the RPC variable
+  };
 
   const search = async () => {
     const addr = address.trim();
@@ -82,17 +98,17 @@ export default function WalletScreen() {
 
     setLoading(true);
     try {
-      const bal = await getBalance(addr).catch(e => {
+      const bal = await getBalance(RPC_URL,addr).catch(e => {
         Alert.alert("Balance Error", e.message);
         return null;
       });
       
-      const tok = await getTokens(addr).catch(e => {
+      const tok = await getTokens(RPC_URL,addr).catch(e => {
         Alert.alert("Tokens Error", e.message);
         return [];
       });
       
-      const tx = await getTxns(addr).catch(e => {
+      const tx = await getTxns(RPC_URL,addr).catch(e => {
         Alert.alert("Transactions Error", e.message);
         return [];
       });
@@ -105,39 +121,53 @@ export default function WalletScreen() {
     }
 };
 
-const tryExample = () => {
+  const tryExample = () => {
     const example = "86xCnPeV69n6t3DnyGvkKobf9FdN2H9oiVDdaMpo2MMY";
     setAddress(example);
   };
 
+  const clearResults = () => {
+    setAddress("");
+    setBalance(null);
+    setTokens([]);
+    setTxns([]);
+  };
+
   return (
-    <SafeAreaView style = {s.safe}>
-      
-      <ScrollView style = {s.scroll}>
-        {/* Header */}
-        <Text style={s.title}>SolScan</Text>
-        <Text style={s.subtitle}>Explore any Solana wallet</Text>
-        <View style= {s.inputContainer}>
+    <SafeAreaView style={s.safe} edges={["top"]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView style={s.scroll}>
+        <View style={s.header}>
+          <View>
+            <Text style={s.title}>SolScan</Text>
+            <Text style={s.subtitle}>Explore any Solana wallet</Text>
+          </View>
+          <TouchableOpacity style={s.networkToggle} onPress={toggleNetwork}>
+            <View style={[s.networkDot, isDevnet && s.networkDotDevnet]} />
+            <Text style={s.networkText}>{isDevnet ? "Devnet" : "Mainnet"}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={s.inputContainer}>
           <TextInput
-              style={s.input}
-              placeholder="Solana wallet address..."
-              placeholderTextColor="#555"
-              value={address}
-              onChangeText={setAddress}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+            style={s.input}
+            placeholder="Enter wallet address..."
+            placeholderTextColor="#6B7280"
+            value={address}
+            onChangeText={setAddress}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
         </View>
 
         <View style={s.btnRow}>
-          {/* 💡 Web: <button onClick={fn}>Search</button>
-                  RN: <TouchableOpacity onPress={fn}><Text>Search</Text></TouchableOpacity>
-                  ALL text must be inside <Text>! */}
           <TouchableOpacity
             style={[s.btn, loading && s.btnDisabled]}
             onPress={search}
             disabled={loading}
-            activeOpacity={0.8}
           >
             {loading ? (
               <ActivityIndicator color="#000" />
@@ -146,16 +176,30 @@ const tryExample = () => {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={s.btnGhost}
-            onPress={tryExample}
-            activeOpacity={0.7}
-          >
-            <Text style={s.btnGhostText}>Demo</Text>
+          <TouchableOpacity style={s.btnGhost} onPress={clearResults}>
+            <Text style={s.btnGhostText}>Clear</Text>
           </TouchableOpacity>
         </View>
 
-         {/* Balance Card */}
+        {searchHistory.length > 0 && balance === null && (
+          <View style={s.historySection}>
+            <Text style={s.historyTitle}>Recent Searches</Text>
+            {searchHistory.slice(0, 5).map((addr) => (
+              <TouchableOpacity
+                key={addr}
+                style={s.historyItem}
+                //onPress={() => searchFromHistory(addr)}
+              >
+                <Ionicons name="time-outline" size={16} color="#6B7280" />
+                <Text style={s.historyAddress} numberOfLines={1}>
+                  {short(addr, 8)}
+                </Text>
+                <Ionicons name="chevron-forward" size={16} color="#6B7280" />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {balance !== null && (
           <View style={s.card}>
             <Text style={s.label}>SOL Balance</Text>
@@ -167,23 +211,28 @@ const tryExample = () => {
           </View>
         )}
 
-        {/* Tokens */}
         {tokens.length > 0 && (
-          <
-          >
+          <>
             <Text style={s.section}>Tokens ({tokens.length})</Text>
             <FlatList
               data={tokens}
               keyExtractor={(t) => t.mint}
               scrollEnabled={false}
               renderItem={({ item }) => (
-                <TouchableOpacity 
-                  onPress={() => {
-                  router.push(`/token/${item.mint}`)
-                }}>
-                  <View style={s.row}>
-                    <Text style={s.mint}>{short(item.mint, 6)}</Text>
+                <TouchableOpacity
+                  style={s.row}
+                  onPress={() =>
+                    router.push(`/token/${item.mint}?amount=${item.amount}`)
+                  }
+                >
+                  <Text style={s.mint}>{short(item.mint, 6)}</Text>
+                  <View style={s.tokenRight}>
                     <Text style={s.amount}>{item.amount}</Text>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={16}
+                      color="#6B7280"
+                    />
                   </View>
                 </TouchableOpacity>
               )}
@@ -191,7 +240,6 @@ const tryExample = () => {
           </>
         )}
 
-        {/* Transactions */}
         {txns.length > 0 && (
           <>
             <Text style={s.section}>Recent Transactions</Text>
@@ -205,7 +253,6 @@ const tryExample = () => {
                   onPress={() =>
                     Linking.openURL(`https://solscan.io/tx/${item.sig}`)
                   }
-                  activeOpacity={0.7}
                 >
                   <View>
                     <Text style={s.mint}>{short(item.sig, 8)}</Text>
@@ -214,10 +261,10 @@ const tryExample = () => {
                     </Text>
                   </View>
                   <Text
-                    style={[
-                      s.statusIcon,
-                      { color: item.ok ? "#14F195" : "#EF4444" },
-                    ]}
+                    style={{
+                      color: item.ok ? "#14F195" : "#EF4444",
+                      fontSize: 18,
+                    }}
                   >
                     {item.ok ? "+" : "-"}
                   </Text>
@@ -227,11 +274,9 @@ const tryExample = () => {
           </>
         )}
 
-        <TextInput onChangeText={setAddress} />
-        
-        <View style={{ height: 80 }} />
-
-      </ScrollView>
+        <View style={{ height: 100 }} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

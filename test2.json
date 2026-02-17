@@ -1,0 +1,52 @@
+{
+    "id": "token-asset-1",
+    "jsonrpc": "2.0",
+    "result": {
+        "authorities": [[Object]],
+        "burnt": false,
+        "compression": {
+            "asset_hash": "",
+            "compressed": false,
+            "creator_hash": "",
+            "data_hash": "", 
+            "eligible": false,
+            "leaf_id": 0,
+            "seq": 0,
+            "tree": ""
+        },
+        "content": {
+            "$schema": "https://schema.metaplex.com/nft1.0.json",
+            "files": [Array],
+            "json_uri": "https://ipfs.io/ipfs/QmUJB8JNGt4nGayFRu1iW7wCmquiBL6xee6AH1PecNoigy",
+            "links": [Object],
+            "metadata": [Object]
+        },
+        "creators": [],
+        "grouping": [],
+        "id": "BKNcAUPAfRYTcyQF33jXDsbjZcyhzAVsi3XrCP4Cu7Xf",
+        "interface": "FungibleToken",
+        "last_indexed_slot": 400182442,
+        "mutable": false,
+        "ownership": {
+            "delegate": null,
+            "delegated": false, 
+            "frozen": false,
+            "owner": "",
+            "ownership_model": "token"
+        },
+        "royalty": {
+            "basis_points": 0,
+            "locked": false,
+            "percent": 0,
+            "primary_sale_happened": false,
+            "royalty_model": "creators",
+            "target": null
+        },
+        "supply": null,
+        "token_info": {
+            "decimals": 6,
+            "supply": 995667841401741,
+            "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+    }
+}

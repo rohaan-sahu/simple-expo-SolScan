@@ -81,4 +81,31 @@ export const mintStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
+  tokenSelector: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#252530",
+    paddingLeft: 8,
+    paddingRight: 12,
+    paddingVertical: 8,
+    borderRadius: 24,
+    gap: 6,
+  },
+  tokenIcon: {
+    width: 32,
+    height: 32,
+    resizeMode: "cover",                // Manages rectangular images
+    borderRadius: 16,
+    backgroundColor: 'red'
+  },
+  tokenIconText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  tokenName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
 });

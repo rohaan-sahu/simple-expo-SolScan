@@ -1,0 +1,16 @@
+{
+    "id": "token-supply-1",
+    "jsonrpc": "2.0",
+    "result": {
+        "context": {
+            "apiVersion": "3.1.8",
+            "slot": 400180702
+        },
+        "value": {
+            "amount": "995667841401741",
+            "decimals": 6,
+            "uiAmount": 995667841.401741,
+            "uiAmountString": "995667841.401741"
+        }
+    }
+}

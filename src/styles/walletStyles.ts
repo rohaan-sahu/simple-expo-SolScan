@@ -10,20 +10,75 @@ export const walletStyles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 28,
+  },
   title: {
     color: "#FFFFFF",
     fontSize: 32,
     fontWeight: "700",
     marginBottom: 8,
-    letterSpacing: -0.5,
   },
   subtitle: {
     color: "#6B7280",
     fontSize: 15,
-    marginBottom: 28,
-    fontWeight: "400",
   },
-
+  networkToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#16161D",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#2A2A35",
+    gap: 6,
+  },
+  networkDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#14F195",
+  },
+  networkDotDevnet: {
+    backgroundColor: "#F59E0B",
+  },
+  networkText: {
+    color: "#9CA3AF",
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  historySection: {
+    marginTop: 24,
+  },
+  historyTitle: {
+    color: "#6B7280",
+    fontSize: 13,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  historyItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#16161D",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#2A2A35",
+    gap: 12,
+  },
+  historyAddress: {
+    flex: 1,
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontFamily: "monospace",
+  },
   inputContainer: {
     backgroundColor: "#16161D",
     borderRadius: 16,
@@ -36,9 +91,7 @@ export const walletStyles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 15,
     paddingVertical: 14,
-    fontWeight: "400",
   },
-
   btnRow: {
     flexDirection: "row",
     gap: 12,
@@ -50,12 +103,6 @@ export const walletStyles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 14,
     alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#14F195",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
   },
   btnDisabled: {
     opacity: 0.6,
@@ -64,7 +111,6 @@ export const walletStyles = StyleSheet.create({
     color: "#0D0D12",
     fontWeight: "600",
     fontSize: 16,
-    letterSpacing: 0.3,
   },
   btnGhost: {
     paddingVertical: 16,
@@ -77,9 +123,7 @@ export const walletStyles = StyleSheet.create({
   btnGhostText: {
     color: "#9CA3AF",
     fontSize: 15,
-    fontWeight: "500",
   },
-
   card: {
     backgroundColor: "#16161D",
     borderRadius: 24,
@@ -88,13 +132,18 @@ export const walletStyles = StyleSheet.create({
     marginTop: 28,
     borderWidth: 1,
     borderColor: "#2A2A35",
+    position: "relative",
+  },
+  favoriteWrapper: {
+    position: "absolute",
+    top: 12,
+    right: 12,
   },
   label: {
     color: "#6B7280",
     fontSize: 13,
-    fontWeight: "500",
     textTransform: "uppercase",
-    letterSpacing: 1.2,
+    letterSpacing: 1,
   },
   balanceRow: {
     flexDirection: "row",
@@ -105,7 +154,6 @@ export const walletStyles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 48,
     fontWeight: "700",
-    letterSpacing: -1,
   },
   sol: {
     color: "#14F195",
@@ -122,18 +170,14 @@ export const walletStyles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    overflow: "hidden",
   },
-
   section: {
     color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "600",
     marginTop: 32,
     marginBottom: 16,
-    letterSpacing: -0.3,
   },
-
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -150,21 +194,20 @@ export const walletStyles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 14,
     fontFamily: "monospace",
-    fontWeight: "500",
   },
   amount: {
     color: "#14F195",
     fontSize: 15,
     fontWeight: "600",
   },
+  tokenRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   time: {
     color: "#6B7280",
     fontSize: 12,
     marginTop: 4,
-    fontWeight: "400",
-  },
-  statusIcon: {
-    fontSize: 18,
-    fontWeight: "600",
   },
 });
