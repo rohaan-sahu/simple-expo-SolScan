@@ -140,11 +140,15 @@ export default function WalletScreen() {
       .finally(() => setLoading(false));
     }
   const tryExample = () => {
-    const example1 = "86xCnPeV69n6t3DnyGvkKobf9FdN2H9oiVDdaMpo2MMY";
-    const example2 = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
-    const example3 = "SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3";
-    const example4 = "B6aJ3TGfme3SMnLSouHXqWXjVFqYyqj7czzhzr8WJFAi";
-    setAddress(example3);
+    const examples = [
+      "86xCnPeV69n6t3DnyGvkKobf9FdN2H9oiVDdaMpo2MMY",
+      "SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3",
+      "B6aJ3TGfme3SMnLSouHXqWXjVFqYyqj7czzhzr8WJFAi"
+    ];
+
+    const randomNum = Math.floor(Math.random()*(examples.length));
+
+    setAddress(examples[randomNum]);
   };
 
   const clearResults = () => {

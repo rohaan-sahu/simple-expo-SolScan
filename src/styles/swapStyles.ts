@@ -1,6 +1,10 @@
 import { StyleSheet } from "react-native";
 
 export const swapStyles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: "#0D0D12",
+  },
   scroll: {
     flex: 1,
     backgroundColor: "#0D0D12",
