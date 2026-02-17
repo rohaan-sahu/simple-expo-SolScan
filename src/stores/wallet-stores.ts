@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { persist, createJSONStorage} from 'zustand/middleware';
+import { asyncStorageAdapter } from "@/lib/storageAS";
 
 // Define the shape of your state
 interface WalletState {
@@ -10,6 +12,7 @@ interface WalletState {
   // Actions
   //GET
   isFavorite: (address: string) => boolean;
+  
   //SET
   addFavorite: (address: string) => void;
   removeFavorite: (address: string) => void;
@@ -18,40 +21,48 @@ interface WalletState {
   toggleNetwork: () => void;
 }
 
-export const useWalletStore = create<WalletState>((set, get) => ({
-  // Initial state
-  favorites: [],
-  searchHistory: [],
-  isDevnet: false,
+export const useWalletStore = create<WalletState>()(
+  persist(
+    (set, get) => ({
+    // Initial state
+    favorites: [],
+    searchHistory: [],
+    isDevnet: false,
 
-  // Actions
-  //GET
-  isFavorite: (address) => get().favorites.includes(address),
+    // Actions
+    //GET
+    isFavorite: (address) => get().favorites.includes(address),
 
-  //SET
-  addFavorite: (address) =>
-    set((state) => ({
-      favorites: state.favorites.includes(address)
-        ? state.favorites // already exists, don't duplicate
-        : [address, ...state.favorites],
-    })),
+    //SET
+    addFavorite: (address) =>
+      set((state) => ({
+        favorites: state.favorites.includes(address)
+          ? state.favorites // already exists, don't duplicate
+          : [address, ...state.favorites],
+      })),
 
-  removeFavorite: (address) =>
-    set((state) => ({
-      favorites: state.favorites.filter((a) => a !== address),
-    })),
+    removeFavorite: (address) =>
+      set((state) => ({
+        favorites: state.favorites.filter((a) => a !== address),
+      })),
 
-  addToHistory: (address) =>
-    set((state) => ({
-      searchHistory: [
-        address,
-        // Remove duplicates — put the latest search first
-        ...state.searchHistory.filter((a) => a !== address),
-      ].slice(0, 20), // Keep only last 20
-    })),
+    addToHistory: (address) =>
+      set((state) => ({
+        searchHistory: [
+          address,
+          // Remove duplicates — put the latest search first
+          ...state.searchHistory.filter((a) => a !== address),
+        ].slice(0, 20), // Keep only last 20
+      })),
 
-  clearHistory: () => set({ searchHistory: [] }),
+    clearHistory: () => set({ searchHistory: [] }),
 
-  toggleNetwork: () =>
-    set((state) => ({ isDevnet: !state.isDevnet })),
-}));
+    toggleNetwork: () =>
+      set((state) => ({ isDevnet: !state.isDevnet })),
+    
+  }),
+  {
+    name: "wallet-storage",
+    storage: createJSONStorage(() => asyncStorageAdapter),
+  }
+));

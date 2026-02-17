@@ -22,7 +22,7 @@ export default function TabLayout() {
                 options={{
                     title: "Wallet",
                     tabBarIcon: ({color,size}) => (
-                        <Ionicons name = "swap-horizontal" size = {size} color={color} />
+                        <Ionicons name = "wallet" size = {size} color={color} />
                     )
                 }}  
             />
@@ -32,6 +32,15 @@ export default function TabLayout() {
                     title: "Swap",
                     tabBarIcon: ({color,size}) => (
                         <Ionicons name = "swap-horizontal" size = {size} color={color} />
+                    )
+                }}  
+            />
+            <Tabs.Screen 
+                name = "settings"
+                options={{
+                    title: "Settings",
+                    tabBarIcon: ({color,size}) => (
+                        <Ionicons name = "settings" size = {size} color={color} />
                     )
                 }}  
             />

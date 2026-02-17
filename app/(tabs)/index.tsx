@@ -19,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 // Local imports
 import { walletStyles as s } from '@/styles/walletStyles';
 import { useWalletStore } from '@/stores/wallet-stores';
+import { FavoriteButton } from '@/components/FavouriteButton';
 
 const rpc = async (rpcUrl: string,method: string, params: any[]) => {
   const res = await fetch(rpcUrl, {
@@ -97,6 +98,7 @@ export default function WalletScreen() {
     if (!addr) return Alert.alert("Enter a wallet address");
 
     setLoading(true);
+    handleSearch(addr);
     try {
       const bal = await getBalance(RPC_URL,addr).catch(e => {
         Alert.alert("Balance Error", e.message);
@@ -119,11 +121,30 @@ export default function WalletScreen() {
     } finally {
       setLoading(false);
     }
-};
+  };
 
+  const searchFromHistory = (addr: string) => {
+    setAddress(addr);
+    addToHistory(addr);
+    setLoading(true);
+    Promise.all([getBalance(RPC_URL,addr), getTokens(RPC_URL,addr), getTxns(RPC_URL,addr)])
+      .then(([bal, tok, tx]) => {
+        setBalance(bal);
+        setTokens(tok);
+        setTxns(tx);
+      })
+      .catch((e: unknown) => {
+        const message = e instanceof Error ? e.message : "Unknown error";
+        Alert.alert("Error", message);
+      })
+      .finally(() => setLoading(false));
+    }
   const tryExample = () => {
-    const example = "86xCnPeV69n6t3DnyGvkKobf9FdN2H9oiVDdaMpo2MMY";
-    setAddress(example);
+    const example1 = "86xCnPeV69n6t3DnyGvkKobf9FdN2H9oiVDdaMpo2MMY";
+    const example2 = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
+    const example3 = "SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3";
+    const example4 = "B6aJ3TGfme3SMnLSouHXqWXjVFqYyqj7czzhzr8WJFAi";
+    setAddress(example3);
   };
 
   const clearResults = () => {
@@ -180,6 +201,23 @@ export default function WalletScreen() {
             <Text style={s.btnGhostText}>Clear</Text>
           </TouchableOpacity>
         </View>
+        <View style={s.btnRow}>
+          <TouchableOpacity style={s.btnGhost} onPress={clearHistory}>
+            <Text style={[s.btnGhostText, {flex: 1}]}>Clear History</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[s.btn, loading && s.btnDisabled]}
+            onPress={tryExample}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={s.btnText}>Demo</Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
         {searchHistory.length > 0 && balance === null && (
           <View style={s.historySection}>
@@ -188,7 +226,7 @@ export default function WalletScreen() {
               <TouchableOpacity
                 key={addr}
                 style={s.historyItem}
-                //onPress={() => searchFromHistory(addr)}
+                onPress={() => searchFromHistory(addr)}
               >
                 <Ionicons name="time-outline" size={16} color="#6B7280" />
                 <Text style={s.historyAddress} numberOfLines={1}>
@@ -202,6 +240,9 @@ export default function WalletScreen() {
 
         {balance !== null && (
           <View style={s.card}>
+            <View style={s.favoriteWrapper}>
+              <FavoriteButton address={address.trim()} />
+            </View>
             <Text style={s.label}>SOL Balance</Text>
             <View style={s.balanceRow}>
               <Text style={s.balance}>{balance.toFixed(4)}</Text>
