@@ -14,7 +14,7 @@ import { sendStyles as s } from "@/styles/sendstyles";
 export default function SendScreen() {
   const router = useRouter();
   const wallet = useWallet();
-  console.log("wallet pubkey: ", wallet.publicKey?.toBase58());
+  //console.log("wallet pubkey: ", wallet.publicKey?.toString());
 
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
@@ -39,7 +39,7 @@ export default function SendScreen() {
         ]
       );
     } catch (error: any) {
-      Alert.alert("Transaction Failed", error.message || "Something went wrong");
+      Alert.alert("Transaction Failed here", error.message || "Something went wrong");
     }
   
   if (!wallet.connected) {
@@ -76,8 +76,8 @@ export default function SendScreen() {
       <View style={s.card}>
         <Text style={s.cardLabel}>From</Text>
         <Text style={s.cardAddress}>
-          {wallet.publicKey?.toBase58().slice(0, 8)}...
-          {wallet.publicKey?.toBase58().slice(-4)}
+          {wallet.publicKey?.toString().slice(0, 8)}...
+          {wallet.publicKey?.toString().slice(-4)}
         </Text>
       </View>
 

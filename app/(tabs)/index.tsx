@@ -175,7 +175,7 @@ export default function WalletScreen() {
             <ConnectButton
               connected={wallet.connected}
               connecting={wallet.connecting}
-              publicKey={wallet.publicKey?.toBase58() ?? null}
+              publicKey={wallet.publicKey?.toString() ?? null}
               onConnect={wallet.connect}
               onDisconnect={wallet.disconnect}
             />

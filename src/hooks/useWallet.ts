@@ -73,11 +73,16 @@ export function useWallet() {
         }
       );
 
+      console.log("auth result: ", authResult);
+
       // authResult.accounts[0].address is a base64 public key
-      const pubkey = new PublicKey(
-        Buffer.from(authResult.accounts[0].address, "base64")
-      );
+      const authAddress = Buffer.from(authResult.accounts[0].address, "base64");
+      const pubkey = new PublicKey(authAddress);
       setPublicKey(pubkey);
+      console.log("auth address ",authAddress);
+      console.log("pubkey: ",pubkey);
+      console.log("public key: ",publicKey);
+      console.log("public key iniialized correctly as string",publicKey instanceof String );    // Some issue here. Not an instance of String or PublicKey
       return pubkey;
     } catch (error: any) {
       console.error("Connect failed:", error);
@@ -110,37 +115,77 @@ export function useWallet() {
     async (toAddress: string, amountSOL: number) => {
       if (!publicKey) throw new Error("Wallet not connected");
 
+      // Verification of proper initialization of Pubkey
+      // if (!(publicKey instanceof PublicKey)) {
+      //   throw new Error("Invalid publicKey: not a PublicKey instance");
+      // }
+
       setSending(true);
       try {
         // Step 1: Build the transaction
+        const fromPublicKey = new PublicKey(publicKey);     // Public Key is 
         const toPublicKey = new PublicKey(toAddress);
+        console.log("to public key: ",toPublicKey);
         const transaction = new Transaction().add(
           SystemProgram.transfer({
-            fromPubkey: publicKey,
+            fromPubkey: fromPublicKey,
             toPubkey: toPublicKey,
             lamports: Math.round(amountSOL * LAMPORTS_PER_SOL),
           })
         );
+        console.log("lamports to be sent: ",Math.round(amountSOL * LAMPORTS_PER_SOL));
+        console.log("Before step 2 ");
 
         // Step 2: Get recent blockhash (needed for transaction)
         const { blockhash } = await connection.getLatestBlockhash();
         transaction.recentBlockhash = blockhash;
-        transaction.feePayer = publicKey;
+        //transaction.feePayer = publicKey;
+        transaction.feePayer = fromPublicKey;
+
+        console.log("Before step 3 ");
+        //console.log("Transaction object: ",JSON.stringify(transaction));
+
 
         // Step 3: Send to Phantom for signing + submission
         const txSignature = await transact(
           async (wallet: Web3MobileWallet) => {
+            console.log("Before step 3.1 ");
             // Re-authorize (Phantom needs this each session)
-            await wallet.authorize({
-              chain: `solana:${cluster}`,
-              identity: APP_IDENTITY,
-            });
+            // await wallet.authorize({
+            //   chain: `solana:${cluster}`,
+            //   identity: APP_IDENTITY,
+            // });
+
+            try {
+              console.log("Starting authorization...");
+              const authResult = await wallet.authorize({
+                chain: `solana:${cluster}`,
+                identity: APP_IDENTITY,
+              });
+              console.log("Authorization successful:", authResult);
+            } catch (authError) {
+              console.error("Authorization error:", authError);
+              throw authError; // Re-throw so it doesn't silently fail
+            }
+
+            console.log("Before step 3.2 ");
 
             // Sign and send — Phantom shows the transaction details
             // User approves → Phantom signs → sends to network
-            const signatures = await wallet.signAndSendTransactions({
-              transactions: [transaction],
-            });
+            // const signatures = await wallet.signAndSendTransactions({
+            //   transactions: [transaction],
+            // });
+
+
+            try {
+                const signatures = await wallet.signAndSendTransactions({
+                  transactions: [transaction],
+                });
+                // Handle result here
+            } catch (error) {
+                console.error('Error during wallet signing operation:', error);
+                // Additional error handling if needed
+            }            console.log("Before step 3.3 ");
 
             return signatures[0];
           }
