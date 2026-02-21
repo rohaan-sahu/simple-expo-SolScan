@@ -20,6 +20,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { walletStyles as s } from '@/styles/walletStyles';
 import { useWalletStore } from '@/stores/wallet-stores';
 import { FavoriteButton } from '@/components/FavouriteButton';
+import { useWallet } from "@/hooks/useWallet";
+import { ConnectButton } from "@/components/ConnectButton";
 
 const rpc = async (rpcUrl: string,method: string, params: any[]) => {
   const res = await fetch(rpcUrl, {
@@ -87,6 +89,8 @@ export default function WalletScreen() {
   const DEVNET_URL = "https://api.devnet.solana.com";
   const MAINNET_URL = "https://api.mainnet-beta.solana.com";
   const RPC_URL = isDevnet ? DEVNET_URL : MAINNET_URL;
+
+  const wallet = useWallet();
 
   const handleSearch = async (address: string) => {
       addToHistory(address); // Save to history automatically
@@ -168,6 +172,13 @@ export default function WalletScreen() {
         <View style={s.header}>
           <View>
             <Text style={s.title}>SolScan</Text>
+            <ConnectButton
+              connected={wallet.connected}
+              connecting={wallet.connecting}
+              publicKey={wallet.publicKey?.toBase58() ?? null}
+              onConnect={wallet.connect}
+              onDisconnect={wallet.disconnect}
+            />
             <Text style={s.subtitle}>Explore any Solana wallet</Text>
           </View>
           <TouchableOpacity style={s.networkToggle} onPress={toggleNetwork}>
@@ -221,6 +232,18 @@ export default function WalletScreen() {
               <Text style={s.btnText}>Demo</Text>
             )}
           </TouchableOpacity>
+          
+        </View>
+        <View style={s.btnRow}>
+          {wallet.connected && (
+            <TouchableOpacity
+              style={s.btn}
+              onPress={() => router.push("/send")}
+            >
+              <Ionicons name="paper-plane" size={20} color="#0a0a1a" />
+              <Text style={s.btnText}>Send SOL</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {searchHistory.length > 0 && balance === null && (

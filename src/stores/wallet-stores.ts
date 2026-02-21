@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage} from 'zustand/middleware';
+import { PublicKey } from "@solana/web3.js";
+
 import { asyncStorageAdapter } from "@/lib/storageAS";
 
 // Define the shape of your state
@@ -8,6 +10,9 @@ interface WalletState {
   favorites: string[];          // saved wallet addresses
   searchHistory: string[];      // recently searched addresses
   isDevnet: boolean;            // devnet vs mainnet toggle
+  publicKey: PublicKey | null;  // Wallet address
+  connecting: boolean;
+  sending: boolean;
 
   // Actions
   //GET
@@ -19,6 +24,9 @@ interface WalletState {
   addToHistory: (address: string) => void;
   clearHistory: () => void;
   toggleNetwork: () => void;
+  setPublicKey: (address: PublicKey | null) => void;
+  setConnecting: (val:boolean) => void;
+  setSending: (val: boolean) => void;
 }
 
 export const useWalletStore = create<WalletState>()(
@@ -28,6 +36,9 @@ export const useWalletStore = create<WalletState>()(
     favorites: [],
     searchHistory: [],
     isDevnet: false,
+    publicKey: null,
+    connecting: false,
+    sending: false,
 
     // Actions
     //GET
@@ -59,7 +70,24 @@ export const useWalletStore = create<WalletState>()(
 
     toggleNetwork: () =>
       set((state) => ({ isDevnet: !state.isDevnet })),
+
+    setPublicKey: (address)=> {
+      set((state) => ({
+        publicKey: address,
+      }))
+    },
     
+    setConnecting: (val)=> {
+      set((state) => ({
+        connecting: val,
+      }))
+    },
+
+    setSending: (val)=> {
+      set((state) => ({
+        sending: val,
+      }))
+    },
   }),
   {
     name: "wallet-storage",
