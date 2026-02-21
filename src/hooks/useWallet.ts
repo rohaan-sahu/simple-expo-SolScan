@@ -42,11 +42,13 @@ export function useWallet() {
   // Wallet actions
   // Actions hold no state. The don't get mutated hence, don't cause any re-render. Hence we don't need useShallow
   const {setConnecting,setSending,setPublicKey} = useWalletStore(
-    (s) => ({
-      setConnecting: s.setConnecting,
-      setSending: s.setSending,
-      setPublicKey: s.setPublicKey,
-    })
+    useShallow( 
+      (s) => ({
+          setConnecting: s.setConnecting,
+          setSending: s.setSending,
+          setPublicKey: s.setPublicKey,
+      })
+    )
   );
   const isDevnet = useWalletStore((s) => s.isDevnet);
   const cluster = isDevnet ? "devnet" : "mainnet-beta";

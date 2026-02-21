@@ -3,6 +3,7 @@ import { persist, createJSONStorage} from 'zustand/middleware';
 import { PublicKey } from "@solana/web3.js";
 
 import { asyncStorageAdapter } from "@/lib/storageAS";
+import { mmkvStorage } from "@/lib/storageMMKV";
 
 // Define the shape of your state
 interface WalletState {
@@ -91,6 +92,7 @@ export const useWalletStore = create<WalletState>()(
   }),
   {
     name: "wallet-storage",
-    storage: createJSONStorage(() => asyncStorageAdapter),
+    //storage: createJSONStorage(() => asyncStorageAdapter),
+    storage: createJSONStorage(() => mmkvStorage),
   }
 ));
