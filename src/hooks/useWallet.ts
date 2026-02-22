@@ -172,20 +172,20 @@ export function useWallet() {
 
             // Sign and send — Phantom shows the transaction details
             // User approves → Phantom signs → sends to network
-            // const signatures = await wallet.signAndSendTransactions({
-            //   transactions: [transaction],
-            // });
+            const signatures = await wallet.signAndSendTransactions({
+              transactions: [transaction],
+            });
 
 
-            try {
-                const signatures = await wallet.signAndSendTransactions({
-                  transactions: [transaction],
-                });
-                // Handle result here
-            } catch (error) {
-                console.error('Error during wallet signing operation:', error);
-                // Additional error handling if needed
-            }            console.log("Before step 3.3 ");
+            // try {
+            //     const signatures = await wallet.signAndSendTransactions({
+            //       transactions: [transaction],
+            //     });
+            //     // Handle result here
+            // } catch (error) {
+            //     console.error('Error during wallet signing operation:', error);
+            //     // Additional error handling if needed
+            // }            console.log("Before step 3.3 ");
 
             return signatures[0];
           }
