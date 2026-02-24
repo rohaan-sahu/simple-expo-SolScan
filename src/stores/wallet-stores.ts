@@ -92,7 +92,7 @@ export const useWalletStore = create<WalletState>()(
   }),
   {
     name: "wallet-storage",
-    storage: createJSONStorage(() => asyncStorageAdapter),
-    //storage: createJSONStorage(() => mmkvStorage),
+    //storage: createJSONStorage(() => asyncStorageAdapter),
+    storage: createJSONStorage(() => mmkvStorage),
   }
 ));

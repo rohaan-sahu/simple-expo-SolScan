@@ -52,8 +52,10 @@ export function useWallet() {
   );
   const isDevnet = useWalletStore((s) => s.isDevnet);
   const cluster = isDevnet ? "devnet" : "mainnet-beta";
+  const mwaCuster = isDevnet ? "devnet" : "mainnet";
 
   const connection = new Connection(clusterApiUrl(cluster), "confirmed");
+  //const connection = new Connection(isDevnet? clusterApiUrl(cluster) : process.env.EXPO_PUBLIC_RPC_URL!, "confirmed");
 
   // ============================================
   // CONNECT — Ask Phantom to authorize our app
@@ -66,7 +68,7 @@ export function useWallet() {
           // This opens Phantom, shows an "Authorize" dialog
           // User taps "Approve" → we get their public key
           const result = await wallet.authorize({
-            chain: `solana:${cluster}`,
+            chain: `solana:${mwaCuster}`,
             identity: APP_IDENTITY,
           });
           return result;
@@ -82,7 +84,7 @@ export function useWallet() {
       console.log("auth address ",authAddress);
       console.log("pubkey: ",pubkey);
       console.log("public key: ",publicKey);
-      console.log("public key iniialized correctly as string",publicKey instanceof String );    // Some issue here. Not an instance of String or PublicKey
+      console.log("pub key iniialized correctly as string",pubkey instanceof PublicKey );    // Some issue here. Not an instance of String or PublicKey
       return pubkey;
     } catch (error: any) {
       console.error("Connect failed:", error);
@@ -137,10 +139,19 @@ export function useWallet() {
         console.log("Before step 2 ");
 
         // Step 2: Get recent blockhash (needed for transaction)
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
-        //transaction.feePayer = publicKey;
-        transaction.feePayer = fromPublicKey;
+        // const { blockhash } = await connection.getLatestBlockhash();
+        // transaction.recentBlockhash = blockhash;
+        // //transaction.feePayer = publicKey;
+        // transaction.feePayer = fromPublicKey;
+
+        try{
+          const { blockhash } = await connection.getLatestBlockhash();
+          transaction.recentBlockhash = blockhash;
+          transaction.feePayer = fromPublicKey;
+        }catch(error){
+          console.log("Blockhash error: ",error);
+          throw error;
+        }
 
         console.log("Before step 3 ");
         //console.log("Transaction object: ",JSON.stringify(transaction));
@@ -159,7 +170,7 @@ export function useWallet() {
             try {
               console.log("Starting authorization...");
               const authResult = await wallet.authorize({
-                chain: `solana:${cluster}`,
+                chain: `solana:${mwaCuster}`,
                 identity: APP_IDENTITY,
               });
               console.log("Authorization successful:", authResult);

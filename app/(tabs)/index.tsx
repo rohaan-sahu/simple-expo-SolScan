@@ -22,6 +22,9 @@ import { useWalletStore } from '@/stores/wallet-stores';
 import { FavoriteButton } from '@/components/FavouriteButton';
 import { useWallet } from "@/hooks/useWallet";
 import { ConnectButton } from "@/components/ConnectButton";
+import { HomeHeaderSubtitle, HomeHeaderTitle } from '@/components/Titles';
+import { SwitchNetwork } from '@/components/TouchableButtons';
+import AddressSearchBar from '@/components/SearchBar';
 
 const rpc = async (rpcUrl: string,method: string, params: any[]) => {
   const res = await fetch(rpcUrl, {
@@ -171,7 +174,7 @@ export default function WalletScreen() {
         <ScrollView style={s.scroll}>
         <View style={s.header}>
           <View>
-            <Text style={s.title}>SolScan</Text>
+            <HomeHeaderTitle/>
             <ConnectButton
               connected={wallet.connected}
               connecting={wallet.connecting}
@@ -179,25 +182,12 @@ export default function WalletScreen() {
               onConnect={wallet.connect}
               onDisconnect={wallet.disconnect}
             />
-            <Text style={s.subtitle}>Explore any Solana wallet</Text>
+            <HomeHeaderSubtitle/>
           </View>
-          <TouchableOpacity style={s.networkToggle} onPress={toggleNetwork}>
-            <View style={[s.networkDot, isDevnet && s.networkDotDevnet]} />
-            <Text style={s.networkText}>{isDevnet ? "Devnet" : "Mainnet"}</Text>
-          </TouchableOpacity>
+          <SwitchNetwork isDevnet={isDevnet} toggleNetwork={toggleNetwork} />
         </View>
 
-        <View style={s.inputContainer}>
-          <TextInput
-            style={s.input}
-            placeholder="Enter wallet address..."
-            placeholderTextColor="#6B7280"
-            value={address}
-            onChangeText={setAddress}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </View>
+        <AddressSearchBar address={address} setAddress={setAddress} />
 
         <View style={s.btnRow}>
           <TouchableOpacity
